@@ -1,34 +1,39 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const searchBtn = document.getElementById('searchBtn');
+function displayResults(data, query) {
+    console.log('Displaying results - Data:', data);
+    console.log('Displaying results - Query:', query);
+    console.log('Is array?', Array.isArray(data));
+    if (Array.isArray(data)) {
+        console.log('Array length:', data.length);
+    }
     
-    searchBtn.addEventListener('click', function() {
-        console.log('Button clicked - making AJAX request...');
-        
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'superheroes.php', true);
-        
-        xhr.onload = function() {
-            console.log('Request completed. Status:', xhr.status);
-            console.log('Full response:', xhr.responseText);
-            console.log('Response length:', xhr.responseText.length);
-            
-            if (xhr.status === 200) {
-                if (xhr.responseText.length === 0) {
-                    alert('The response is empty!');
-                } else {
-                    alert('Response: ' + xhr.responseText);
-                }
-            } else {
-                alert('Error: Status ' + xhr.status);
-            }
-        };
-        
-        xhr.onerror = function() {
-            console.log('Request failed');
-            alert('Request failed - check console for details');
-        };
-        
-        xhr.send();
-        console.log('Request sent...');
-    });
-});
+    let html = '';
+    
+    if (Array.isArray(data)) {
+        if (data.length === 0) {
+            // Empty array means no superhero found
+            html = '<div class="error-message">SUPERHERO NOT FOUND</div>';
+        } else if (query === '') {
+            // Only show the list when search is empty
+            html = '<div class="superhero-list">';
+            data.forEach(alias => {
+                html += '<div>- ' + escapeHTML(alias) + '</div>';
+            });
+            html += '</div>';
+        } else {
+            // If we get an array but there was a query, it means no match found
+            html = '<div class="error-message">SUPERHERO NOT FOUND</div>';
+        }
+    } else {
+        // Single superhero found
+        html = `
+            <div class="superhero-card">
+                <h3 class="superhero-alias">${escapeHTML(data.alias)}</h3>
+                <h4 class="superhero-name">A.K.A ${escapeHTML(data.name)}</h4>
+                <p class="superhero-bio">${escapeHTML(data.biography)}</p>
+            </div>
+        `;
+    }
+    
+    resultDiv.innerHTML = html;
+}
+

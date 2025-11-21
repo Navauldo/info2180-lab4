@@ -63,12 +63,36 @@ $superheroes = [
   ], 
 ];
 
+header('Content-Type: application/json');
+
+$query = isset($_GET['query']) ? trim($_GET['query']) : '';
+
+if (empty($query)) {
+    $aliases = array_map(function($hero) {
+        return $hero['alias'];
+    }, $superheroes);
+    echo json_encode($aliases);
+} else {
+    $found = null;
+    foreach ($superheroes as $superhero) {
+        // Check for exact match (case-insensitive)
+        if (strtolower($superhero['alias']) === strtolower($query) || 
+            strtolower($superhero['name']) === strtolower($query)) {
+            $found = $superhero;
+            break;
+        }
+    }
+    
+    if ($found) {
+        echo json_encode($found);
+    } else {
+        echo json_encode([]);
+    }
+}
+
 ?>
 
 
 
-<ul>
-<?php foreach ($superheroes as $superhero): ?>
-  <li><?= $superhero['alias']; ?></li>
-<?php endforeach; ?>
-</ul>
+
+
